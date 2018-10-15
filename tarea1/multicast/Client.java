@@ -12,8 +12,7 @@ public class Client {
             Socket socket = new Socket("127.0.0.1", 9999);
 
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
-
-            inputStream.
+            
 
 
         } catch (IOException e) {
