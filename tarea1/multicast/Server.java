@@ -24,7 +24,7 @@ public class Server {
             MulticastSocket multicastSocket = new MulticastSocket();
             multicastSocket.setReuseAddress(true);
             //multicastSocket.setInterface(InetAddress.getByName("192.168.0.5"));
-            InetAddress group = InetAddress.getLocalHost();
+            InetAddress group = InetAddress.getByName("224.0.0.1");
 
             DatagramSocket socket = new DatagramSocket();
 
@@ -41,7 +41,7 @@ public class Server {
                     Random rand = new Random();
                     int value = rand.nextInt(50);
 
-                    VarBody Var = new VarBody(Id, "Temperature:", value);
+                    measurementBody Var = new measurementBody(Id, "Temperature:", value);
 
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                     ObjectOutputStream os = new ObjectOutputStream(outputStream);
@@ -125,7 +125,7 @@ public class Server {
                     Random rand = new Random();
                     int value = rand.nextInt(50);
 
-                    VarBody Var = new VarBody(Id, "Temperature:", value);
+                    measurementBody Var = new measurementBody(Id, "Temperature:", value);
 
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                     ObjectOutputStream os = new ObjectOutputStream(outputStream);

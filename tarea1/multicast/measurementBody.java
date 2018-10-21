@@ -2,13 +2,13 @@ package tarea1.multicast;
 
 import java.io.Serializable;
 
-public class VarBody implements Serializable{
+public class measurementBody implements Serializable{
 
     private Integer id;
     private String variable;
     private Integer value;
 
-    public VarBody(int id, String variable, int value) {
+    public measurementBody(int id, String variable, int value) {
         this.id = id;
         this.variable = variable;
         this.value = value;

@@ -16,7 +16,7 @@ public class Client {
         MulticastSocket socket = new MulticastSocket(9003);
         socket.setReuseAddress(true);
 
-        InetAddress group = InetAddress.getLocalHost();//getByName("10.10.2.253");
+        InetAddress group = InetAddress.getByName("224.0.0.1");
         DatagramPacket packet;
         socket.joinGroup(group);
 
@@ -32,7 +32,7 @@ public class Client {
 
             try {
 
-                VarBody Var = (VarBody) is.readObject();
+                measurementBody Var = (measurementBody) is.readObject();
                 System.out.println(Var.getId().toString() + ".-" + Var.getVariable() + " " + Var.getValue());
 
             } catch (ClassNotFoundException e) {
@@ -80,7 +80,7 @@ public class Client {
 
             try {
 
-                VarBody Var = (VarBody) is.readObject();
+                measurementBody Var = (measurementBody) is.readObject();
                 System.out.println(Var.getId().toString() + ".-" + Var.getVariable() + " " + Var.getValue());
 
             } catch (ClassNotFoundException e) {
