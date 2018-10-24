@@ -6,44 +6,97 @@ import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.regex.Pattern;
+
+import static java.lang.Thread.interrupted;
 
 public class Client {
 
-    public static void main(String[] args) throws IOException {
+    private static String Address = "224.0.0.1";
+    private static final Pattern IPV4_PATTERN = Pattern.compile("^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\\.(?!$)|$)){4}$");
+    private static ArrayList<Integer> Ports = new ArrayList<Integer>() {{
+        add(9001);
+        add(9002);
+        add(9003);
+    }};
+    //private static final Pattern BINARY_PATTERN = Pattern.compile("([1][01])|1");
+    
+    public static void main(String[] args) {
 
-        //clientFrame client = new clientFrame(9003);
+        String request = "";
+        System.out.print("Java client ");
 
-        MulticastSocket socket = new MulticastSocket(9003);
-        socket.setReuseAddress(true);
+        Scanner terminal = new Scanner(System.in).useDelimiter("[,\\s+]");
+        String[] base = terminal.nextLine().split(" ");
 
-        InetAddress group = InetAddress.getByName("224.0.0.1");
-        DatagramPacket packet;
-        socket.joinGroup(group);
-
-        while(true){
-            byte[] buf = new byte[256];
-            packet = new DatagramPacket(buf, buf.length);
-            socket.receive(packet);
-
-            if(packet.getLength() == 0) break;
-
-            byte[] data = packet.getData();
-            ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(data));
-
-            try {
-
-                measurementBody Var = (measurementBody) is.readObject();
-                System.out.println(Var.getId().toString() + ".-" + Var.getVariable() + " " + Var.getValue());
-
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
+        for (String aBase : base) {
+            if (IPV4_PATTERN.matcher(aBase).matches()) {
+                Address = aBase;
+            } else request = aBase;
         }
-        socket.leaveGroup(group);
-        socket.close();
 
+        for (int i = 0, n = request.length(); i < n; i++)
+            if (request.charAt(i) != '0') {
+                Thread thread = new Thread(new BlindInAddress(Address, Ports.get(i)));
+                thread.start();
+            }
+
+        System.out.println("Connected in: " + Address);
     }
 }
+
+class BlindInAddress implements Runnable {
+
+    private String Address;
+    private Integer Port;
+
+    public BlindInAddress(String Address, int Port) {
+        this.Address = Address;
+        this.Port = Port;
+    }
+
+    @Override
+    public void run() {
+        try {
+            MulticastSocket socket = new MulticastSocket(Port);
+            socket.setReuseAddress(true);
+
+            InetAddress group = InetAddress.getByName(Address);
+            DatagramPacket packet;
+            socket.joinGroup(group);
+
+            while (!interrupted()) {
+                byte[] buf = new byte[256];
+                packet = new DatagramPacket(buf, buf.length);
+                socket.receive(packet);
+
+                if (packet.getLength() == 0) break;
+
+                byte[] data = packet.getData();
+                ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(data));
+
+                try {
+
+                    measurementBody Var = (measurementBody) is.readObject();
+                    System.out.println(Var.getId().toString() + ".-" + Var.getVariable() + " " + Var.getValue());
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            socket.leaveGroup(group);
+            socket.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}
+
 
 /*class clientFrame{
     InetAddress address;
