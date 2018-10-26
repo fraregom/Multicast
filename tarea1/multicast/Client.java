@@ -13,7 +13,7 @@ import static java.lang.Thread.interrupted;
 
 public class Client {
 
-    private static String AddressMulticast = "224.0.0.1";
+    private static String AddressMulticast = "239.0.0.2";
     private static String ServerAddress = null;
     private static Integer RequestPort = 9000;
     private static final Pattern IPV4_PATTERN = Pattern.compile("^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\\.(?!$)|$)){4}$");
@@ -91,7 +91,7 @@ class BlindInAddress implements Runnable {
                 try {
 
                     measurementBody Var = (measurementBody) is.readObject();
-                    System.out.println(Var.getId().toString() + ".-" + Var.getVariable() + " " + Var.getValue());
+                    System.out.println(Var.getId().toString() + ".- " + Var.getVariable() + " " + Var.getValue());
 
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
@@ -130,13 +130,12 @@ class RequestThread implements Runnable{
                     System.out.println(line);
                 }
                 request.close();
+                socket.close();
+                stream.close();
 
             } catch(Exception e){
                 System.err.println("Error: Target File Cannot Be Read");
             }
-
-            socket.close();
-            stream.close();
 
         } catch (IOException e) {
             System.out.println(e.getMessage());

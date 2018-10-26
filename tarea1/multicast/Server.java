@@ -16,7 +16,7 @@ import static java.lang.Thread.sleep;
 
 public class Server {
 
-    private static String MulticastAddress = "224.0.0.1";
+    private static String MulticastAddress = "239.0.0.2";
     private static Integer RequestPort = 9000;
     private static HashMap<String, Integer> variables =
             new HashMap<String, Integer>() {{
@@ -146,7 +146,7 @@ class SendingInAddress implements Runnable {
 }
 
 class RecoveryService implements Runnable {
-    int Port;
+    private int Port;
 
     public RecoveryService(int Port) {
         this.Port = Port;
@@ -156,31 +156,32 @@ class RecoveryService implements Runnable {
     public void run() {
         try {
             ServerSocket serversocket = new ServerSocket(Port);
-            Socket socket = serversocket.accept();
+            Socket socket;
             DataInputStream request;
             BufferedReader output;
             DataOutputStream stream = null;
             String dString;
 
             while(!interrupted()) {
+                socket = serversocket.accept();
                 request = new DataInputStream(socket.getInputStream());
                 String msg_received = request.readUTF();
+
                 if (msg_received.equals("GET")) {
                     try {
-                        output = new BufferedReader(new FileReader("data")); //cambiar esto!!!
+                        output = new BufferedReader(new FileReader("data"));
                         while ((dString = output.readLine()) != null) {
-
                             stream = new DataOutputStream(socket.getOutputStream());
                             stream.writeUTF(dString + "\n");
-
                         }
+                        stream.close();
+                        socket.close();
                     } catch (IOException e) {
                         System.out.println(e.getMessage());
                     }
                 }
             }
-            //stream.close();
-            //socket.close();
+
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
