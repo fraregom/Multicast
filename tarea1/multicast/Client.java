@@ -16,6 +16,7 @@ public class Client {
 
     private static String Address = "224.0.0.1";
     private static final Pattern IPV4_PATTERN = Pattern.compile("^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\\.(?!$)|$)){4}$");
+    private static Pattern inf = Pattern.compile("^[10][10][10]");
     private static ArrayList<Integer> Ports = new ArrayList<Integer>() {{
         add(9001);
         add(9002);
@@ -34,8 +35,13 @@ public class Client {
         for (String aBase : base) {
             if (IPV4_PATTERN.matcher(aBase).matches()) {
                 Address = aBase;
-            } else request = aBase;
+            }if (aBase.equals("-R")) {
+                System.out.println( " -R funca" );
+            }if (inf.matcher(aBase).matches()){
+                request = aBase;
+            }
         }
+
 
         for (int i = 0, n = request.length(); i < n; i++)
             if (request.charAt(i) != '0') {
