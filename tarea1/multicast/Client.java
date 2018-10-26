@@ -13,7 +13,7 @@ import static java.lang.Thread.interrupted;
 
 public class Client {
 
-    private static String AddressMulticast = "239.0.0.2";
+    private static String AddressMulticast = "224.0.0.1";
     private static String ServerAddress = null;
     private static Integer RequestPort = 9000;
     private static final Pattern IPV4_PATTERN = Pattern.compile("^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\\.(?!$)|$)){4}$");

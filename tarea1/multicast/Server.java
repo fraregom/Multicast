@@ -16,7 +16,7 @@ import static java.lang.Thread.sleep;
 
 public class Server {
 
-    private static String MulticastAddress = "239.0.0.2";
+    private static String MulticastAddress = "224.0.0.1";
     private static Integer RequestPort = 9000;
     private static HashMap<String, Integer> variables =
             new HashMap<String, Integer>() {{
