@@ -13,6 +13,9 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 import static java.lang.Thread.interrupted;
 import static java.lang.Thread.sleep;
 
@@ -42,6 +45,18 @@ public class Server {
 
         if (temporalAdress != null) Address = temporalAdress;
         System.out.println("IP-server: " + Address);
+
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("data"));
+
+
+            writer.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+
 
         for (Map.Entry<String, Integer> var : variables.entrySet()) {
             Thread thread = new Thread(new SendingInAddress(var.getValue(), Address, var.getKey()));
@@ -101,6 +116,13 @@ class SendingInAddress implements Runnable {
                             break;
                         }
                     }
+
+                    String row =  String.join(" ", String.valueOf(Id), Variable , String.valueOf(value),"\n");
+                    BufferedWriter writer = new BufferedWriter(new FileWriter("data", true));
+                    writer.append(row);
+                    writer.close();
+
+
 
                     measurementBody Var = new measurementBody(Id, Variable, value);
 
