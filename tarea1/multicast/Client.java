@@ -1,11 +1,10 @@
 package tarea1.multicast;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -15,18 +14,19 @@ import static java.lang.Thread.interrupted;
 public class Client {
 
     private static String Address = "224.0.0.1";
+    private static Integer RequestPort = 9000;
     private static final Pattern IPV4_PATTERN = Pattern.compile("^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\\.(?!$)|$)){4}$");
-    private static Pattern inf = Pattern.compile("^[10][10][10]");
     private static ArrayList<Integer> Ports = new ArrayList<Integer>() {{
-        add(9001);
-        add(9002);
-        add(9003);
+        add(10001);
+        add(10002);
+        add(10003);
     }};
     //private static final Pattern BINARY_PATTERN = Pattern.compile("([1][01])|1");
-    
+
     public static void main(String[] args) {
 
         String request = "";
+        boolean acceptedAddress = false;
         System.out.print("Java client ");
 
         Scanner terminal = new Scanner(System.in).useDelimiter("[,\\s+]");
@@ -35,21 +35,19 @@ public class Client {
         for (String aBase : base) {
             if (IPV4_PATTERN.matcher(aBase).matches()) {
                 Address = aBase;
-            }if (aBase.equals("-R")) {
-                System.out.println( " -R funca" );
-            }if (inf.matcher(aBase).matches()){
-                request = aBase;
-            }
+            } else request = aBase;
         }
-
-
+        /*
         for (int i = 0, n = request.length(); i < n; i++)
             if (request.charAt(i) != '0') {
                 Thread thread = new Thread(new BlindInAddress(Address, Ports.get(i)));
                 thread.start();
+                acceptedAddress = true;
             }
 
-        System.out.println("Connected in: " + Address);
+        if(acceptedAddress) System.out.println("Connected in: " + Address);*/
+        Thread thread = new Thread(new RequestThread(RequestPort, Address));
+        thread.start();
     }
 }
 
@@ -103,52 +101,39 @@ class BlindInAddress implements Runnable {
 
 }
 
+class RequestThread implements Runnable{
+    private int Port;
+    private String serverAddress;
 
-/*class clientFrame{
-    InetAddress address;
-    DatagramSocket socket = null;
-    DatagramPacket packet;
-    byte[] buf = new byte[256]; //Se definen los datos de donde el cliente envio la peticion.
-    byte[] buf2 = new byte[1024];
-    boolean check = false;
+    public RequestThread(int Port, String serverAddress){
+        this.Port = Port;
+        this.serverAddress = serverAddress;
+    }
 
-    public clientFrame(int port){
+    @Override
+    public void run() {
         try {
-            socket = new DatagramSocket(); //Se crea un socket para enviar el paquete a crear.
-            address = InetAddress.getLocalHost();
-            packet = new DatagramPacket(buf, buf.length, address, port); //se define que la peticion se enviara al puerto 4445 del server
-            socket.send(packet);
+            Socket socket = new Socket(serverAddress, Port);
+            DataOutputStream stream = new DataOutputStream(socket.getOutputStream());
+            stream.writeUTF("GET");
 
-            packet = new DatagramPacket(buf2, buf2.length); //Esto imprimira lo que responda el servidor.
-            socket.receive(packet);
 
-            while(true) {
-            packet = new DatagramPacket(buf2, buf2.length); //Esto imprimira lo que responda el servidor.
-            socket.receive(packet);
-            if(!check){
-                System.out.println(packet.getPort());
-                System.out.println(packet.getAddress());
-                System.out.println(packet.getLength());
-                System.out.println(packet.getOffset());
-                System.out.println(packet.getSocketAddress());
-                check = true;
+            try{
+                BufferedReader request = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                for (String line = request.readLine(); line != null; line = request.readLine()) {
+                    System.out.println(line);
+                }
+                request.close();
+
+            } catch(Exception e){
+                System.err.println("Error: Target File Cannot Be Read");
             }
 
-            byte[] data = packet.getData();
-            ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(data));
-
-            try {
-
-                measurementBody Var = (measurementBody) is.readObject();
-                System.out.println(Var.getId().toString() + ".-" + Var.getVariable() + " " + Var.getValue());
-
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+            socket.close();
+            stream.close();
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
-}*/
+}

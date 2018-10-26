@@ -1,12 +1,7 @@
 package tarea1.multicast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.io.*;
+import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -21,12 +16,13 @@ import static java.lang.Thread.sleep;
 
 public class Server {
 
-    private static String Address = "224.0.0.1";
+    private static String MulticastAddress = "224.0.0.1";
+    private static Integer RequestPort = 9000;
     private static HashMap<String, Integer> variables =
             new HashMap<String, Integer>() {{
-                put("Temperature", 9001);
-                put("Humidity", 9002);
-                put("Pressure", 9003);
+                put("Temperature", 10001);
+                put("Humidity", 10002);
+                put("Pressure", 10003);
             }};
 
 
@@ -40,11 +36,11 @@ public class Server {
         try {
             temporalAdress = terminal.next(Pattern.compile("^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\\.(?!$)|$)){4}$"));
         } catch (Exception e) {
-            System.out.println("It has been established as IP-server: " + Address);
+            System.out.println("It has been established as IP-server: " + MulticastAddress);
         }
 
-        if (temporalAdress != null) Address = temporalAdress;
-        System.out.println("IP-server: " + Address);
+        if (temporalAdress != null) MulticastAddress = temporalAdress;
+        System.out.println("IP-server: " + MulticastAddress);
 
 
         try {
@@ -59,9 +55,12 @@ public class Server {
 
 
         for (Map.Entry<String, Integer> var : variables.entrySet()) {
-            Thread thread = new Thread(new SendingInAddress(var.getValue(), Address, var.getKey()));
+            Thread thread = new Thread(new SendingInAddress(var.getValue(), MulticastAddress, var.getKey()));
             thread.start();
         }
+
+        Thread recoveryThread = new Thread(new RecoveryService(RequestPort));
+        recoveryThread.start();
 
     }
 
@@ -151,81 +150,49 @@ class SendingInAddress implements Runnable {
     }
 }
 
-        /*try {
-            byte[] buf = new byte[256];
+class RecoveryService implements Runnable {
+    int Port;
 
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);  //Se obtiene toda la informacion del cliente para enviar una respuesta.
-            socket.receive(packet);
-
-            // Agregar aqui la logica de revisar el paquete y designar los puertos para responder.
-
-            ThreadServer server = new ThreadServer(packet.getAddress(), socket, packet.getPort()); //Se le designara un puerto segun lo solicitado, en este caso el 9000
-            server.start();
-
-        } catch (Exception e) {
-            socket.setSoTimeout(100);
-            e.printStackTrace();
-        }*/
-
-/*class ThreadServer extends Thread {
-
-    private InetAddress adress;
-    private byte [] data;
-    private int port;
-    private DatagramSocket socket;
-
-
-    public ThreadServer(InetAddress address, DatagramSocket Socket, int port){
-        this.adress = address;
-        this.port = port ;
-        this.socket = Socket;
+    public RecoveryService(int Port) {
+        this.Port = Port;
     }
-
 
     @Override
     public void run() {
+        try {
+            ServerSocket serversocket = new ServerSocket(Port);
+            Socket socket = serversocket.accept();
+            DataInputStream request;
+            BufferedReader output;
+            DataOutputStream stream = null;
+            String dString;
 
-        try{
+            while(!interrupted()) {
+                request = new DataInputStream(socket.getInputStream());
+                String msg_received = request.readUTF();
+                if (msg_received.equals("GET")) {
+                    try {
+                        output = new BufferedReader(new FileReader("D:\\Quest\\Escritorio\\Multicast\\tarea1\\multicast\\one-liners.txt")); //cambiar esto!!!
+                        while ((dString = output.readLine()) != null) {
 
-            DatagramPacket firstResponse = new DatagramPacket(data, data.length, adress, port);
-            socket.send(firstResponse);
+                            stream = new DataOutputStream(socket.getOutputStream());
+                            stream.writeUTF(dString + "\n");
 
-            //BufferedReader input = new BufferedReader(
-            //        new FileReader("D:\\Quest\\Escritorio\\Multicast\\tarea1\\multicast\\one-liners.txt")); //cambiar esto!!!
-            //String dString;
-            Integer Id = 1;
+                        }
+                        stream.close();
 
-            while (Id < 10000){//(dString = input.readLine()) != null){
-
-                try {
-                    Random rand = new Random();
-                    int value = rand.nextInt(50);
-
-                    measurementBody Var = new measurementBody(Id, "Temperature:", value);
-
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    ObjectOutputStream os = new ObjectOutputStream(outputStream);
-                    os.writeObject(Var);
-                    data = outputStream.toByteArray();
-
-                    //data = dString.getBytes(); //Se convierte en bytes una linea del texto.
-                    DatagramPacket dgp = new DatagramPacket(data, data.length, adress, port);
-                    socket.send(dgp);
-
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
-
-                Id++;
-
             }
-            socket.close();
 
+            socket.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-
     }
+}
 
-}*/
+
 
