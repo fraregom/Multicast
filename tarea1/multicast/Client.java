@@ -91,7 +91,7 @@ class BlindInAddress implements Runnable {
                 try {
 
                     measurementBody Var = (measurementBody) is.readObject();
-                    System.out.println(Var.getId().toString() + ".-" + Var.getVariable() + " " + Var.getValue());
+                    System.out.println(Var.getId().toString() + ".- " + Var.getVariable() + " " + Var.getValue());
 
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
@@ -130,13 +130,12 @@ class RequestThread implements Runnable{
                     System.out.println(line);
                 }
                 request.close();
+                socket.close();
+                stream.close();
 
             } catch(Exception e){
                 System.err.println("Error: Target File Cannot Be Read");
             }
-
-            socket.close();
-            stream.close();
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
