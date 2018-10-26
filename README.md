@@ -21,17 +21,20 @@
         * 10001 : Temperatura
         * 10002 : Humedad
         * 10003 : Presión
+        
    * Dirección IP Multicast por defecto
    
         * 224.0.0.1    
     
-   * Especificaciones
-        * [-R] : Variable opcional para recuperar el historial
-        * 
+   * Consideraciones
+        * [-R] : Variable opcional para recuperar el historial    
+        * La conexión al servidor, solo se realizara si se conoce la dirección IP de la maquina antes mencionada.      
     
    
    * Ejemplo del Cliente:
    
-            user@user:∼$ java client <ip multicast> 101 -R
-   
-    
+            user@user:∼$ java client 10.10.2.65 101 -R  
+   * Ejemplo de Servidor:
+         
+               user@user:∼$ java server 224.0.0.1
+       
