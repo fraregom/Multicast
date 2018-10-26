@@ -13,9 +13,11 @@ import static java.lang.Thread.interrupted;
 
 public class Client {
 
-    private static String Address = "224.0.0.1";
+    private static String AddressMulticast = "224.0.0.1";
+    private static String ServerAddress = null;
     private static Integer RequestPort = 9000;
     private static final Pattern IPV4_PATTERN = Pattern.compile("^(?:(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(\\.(?!$)|$)){4}$");
+    private static Pattern inf = Pattern.compile("^[10][10][10]");
     private static ArrayList<Integer> Ports = new ArrayList<Integer>() {{
         add(10001);
         add(10002);
@@ -34,20 +36,25 @@ public class Client {
 
         for (String aBase : base) {
             if (IPV4_PATTERN.matcher(aBase).matches()) {
-                Address = aBase;
-            } else request = aBase;
+                ServerAddress = aBase;
+            }if (aBase.equals("-R")) {
+                System.out.println( " -R funca" ); //Aplicar aqui la funcion para retornar el registro
+                Thread thread = new Thread(new RequestThread(RequestPort, ServerAddress));
+                thread.start();
+            }if (inf.matcher(aBase).matches()){
+                request = aBase;
+            }
         }
-        /*
+
         for (int i = 0, n = request.length(); i < n; i++)
             if (request.charAt(i) != '0') {
-                Thread thread = new Thread(new BlindInAddress(Address, Ports.get(i)));
+                Thread thread = new Thread(new BlindInAddress(AddressMulticast, Ports.get(i)));
                 thread.start();
                 acceptedAddress = true;
             }
 
-        if(acceptedAddress) System.out.println("Connected in: " + Address);*/
-        Thread thread = new Thread(new RequestThread(RequestPort, Address));
-        thread.start();
+        if(acceptedAddress) System.out.println("Connected in: " + AddressMulticast);
+
     }
 }
 
@@ -116,7 +123,6 @@ class RequestThread implements Runnable{
             Socket socket = new Socket(serverAddress, Port);
             DataOutputStream stream = new DataOutputStream(socket.getOutputStream());
             stream.writeUTF("GET");
-
 
             try{
                 BufferedReader request = new BufferedReader(new InputStreamReader(socket.getInputStream()));

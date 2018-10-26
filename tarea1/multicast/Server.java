@@ -42,7 +42,6 @@ public class Server {
         if (temporalAdress != null) MulticastAddress = temporalAdress;
         System.out.println("IP-server: " + MulticastAddress);
 
-
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("data"));
 
@@ -51,8 +50,6 @@ public class Server {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-
-
 
         for (Map.Entry<String, Integer> var : variables.entrySet()) {
             Thread thread = new Thread(new SendingInAddress(var.getValue(), MulticastAddress, var.getKey()));
@@ -116,12 +113,10 @@ class SendingInAddress implements Runnable {
                         }
                     }
 
-                    String row =  String.join(" ", String.valueOf(Id), Variable , String.valueOf(value),"\n");
+                    String row =  String.join(" ", String.valueOf(Id)+".-", Variable , String.valueOf(value),"\n");
                     BufferedWriter writer = new BufferedWriter(new FileWriter("data", true));
                     writer.append(row);
                     writer.close();
-
-
 
                     measurementBody Var = new measurementBody(Id, Variable, value);
 
@@ -172,22 +167,20 @@ class RecoveryService implements Runnable {
                 String msg_received = request.readUTF();
                 if (msg_received.equals("GET")) {
                     try {
-                        output = new BufferedReader(new FileReader("D:\\Quest\\Escritorio\\Multicast\\tarea1\\multicast\\one-liners.txt")); //cambiar esto!!!
+                        output = new BufferedReader(new FileReader("data")); //cambiar esto!!!
                         while ((dString = output.readLine()) != null) {
 
                             stream = new DataOutputStream(socket.getOutputStream());
                             stream.writeUTF(dString + "\n");
 
                         }
-                        stream.close();
-
                     } catch (IOException e) {
                         System.out.println(e.getMessage());
                     }
                 }
             }
-
-            socket.close();
+            //stream.close();
+            //socket.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
