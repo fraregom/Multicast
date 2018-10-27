@@ -44,8 +44,6 @@ public class Server {
 
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("data"));
-
-
             writer.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -148,6 +146,7 @@ class SendingInAddress implements Runnable {
 class RecoveryService implements Runnable {
     private int Port;
 
+
     public RecoveryService(int Port) {
         this.Port = Port;
     }
@@ -166,13 +165,24 @@ class RecoveryService implements Runnable {
                 socket = serversocket.accept();
                 request = new DataInputStream(socket.getInputStream());
                 String msg_received = request.readUTF();
-
-                if (msg_received.equals("GET")) {
+                if (msg_received.split(" ")[0].equals("GET")) {
                     try {
                         output = new BufferedReader(new FileReader("data"));
                         while ((dString = output.readLine()) != null) {
-                            stream = new DataOutputStream(socket.getOutputStream());
-                            stream.writeUTF(dString + "\n");
+                            //msg_received.split(" ")[0].charAt(0)
+
+                            if(msg_received.split(" ")[1].charAt(0) == 1  && dString.split(" ")[1].equals("Temperature")) {
+                                stream = new DataOutputStream( socket.getOutputStream() );
+                                stream.writeUTF( dString + "\n" );
+                            }
+                            if(msg_received.split(" ")[1].charAt(1) == 1  && dString.split(" ")[1].equals("Humidity")) {
+                                stream = new DataOutputStream( socket.getOutputStream() );
+                                stream.writeUTF( dString + "\n" );
+                            }
+                            if(msg_received.split(" ")[1].charAt(2) == 1  && dString.split(" ")[1].equals("Pressure")) {
+                                stream = new DataOutputStream( socket.getOutputStream() );
+                                stream.writeUTF( dString + "\n" );
+                            }
                         }
                         stream.close();
                         socket.close();

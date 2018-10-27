@@ -37,12 +37,12 @@ public class Client {
         for (String aBase : base) {
             if (IPV4_PATTERN.matcher(aBase).matches()) {
                 ServerAddress = aBase;
-            }if (aBase.equals("-R")) {
-                System.out.println( " -R funca" ); //Aplicar aqui la funcion para retornar el registro
-                Thread thread = new Thread(new RequestThread(RequestPort, ServerAddress));
-                thread.start();
+
             }if (inf.matcher(aBase).matches()){
                 request = aBase;
+            }if (aBase.equals("-R")) {
+                Thread thread = new Thread( new RequestThread( RequestPort, ServerAddress, request ) );
+                thread.start();
             }
         }
 
@@ -111,10 +111,12 @@ class BlindInAddress implements Runnable {
 class RequestThread implements Runnable{
     private int Port;
     private String serverAddress;
+    private String bin;
 
-    public RequestThread(int Port, String serverAddress){
+    public RequestThread(int Port, String serverAddress, String bin){
         this.Port = Port;
         this.serverAddress = serverAddress;
+        this.bin = bin;
     }
 
     @Override
@@ -122,7 +124,7 @@ class RequestThread implements Runnable{
         try {
             Socket socket = new Socket(serverAddress, Port);
             DataOutputStream stream = new DataOutputStream(socket.getOutputStream());
-            stream.writeUTF("GET");
+            stream.writeUTF("GET " + bin);
 
             try{
                 BufferedReader request = new BufferedReader(new InputStreamReader(socket.getInputStream()));
