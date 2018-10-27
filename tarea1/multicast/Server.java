@@ -43,7 +43,7 @@ public class Server {
         System.out.println("IP-server: " + MulticastAddress);
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("data"));
+            BufferedWriter writer = new BufferedWriter(new FileWriter("data.txt"));
             writer.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -112,7 +112,7 @@ class SendingInAddress implements Runnable {
                     }
 
                     String row =  String.join(" ", String.valueOf(Id)+".-", Variable , String.valueOf(value),"\n");
-                    BufferedWriter writer = new BufferedWriter(new FileWriter("data", true));
+                    BufferedWriter writer = new BufferedWriter(new FileWriter("data.txt", true));
                     writer.append(row);
                     writer.close();
 
@@ -166,24 +166,24 @@ class RecoveryService implements Runnable {
                 request = new DataInputStream(socket.getInputStream());
                 String msg_received = request.readUTF();
                 if (msg_received.split(" ")[0].equals("GET")) {
+                    System.out.print(msg_received + '\n');
                     try {
-                        output = new BufferedReader(new FileReader("data"));
+                        output = new BufferedReader(new FileReader("data.txt"));
                         while ((dString = output.readLine()) != null) {
-                            //msg_received.split(" ")[0].charAt(0)
 
-                            if(msg_received.split(" ")[1].charAt(0) == 1  && dString.split(" ")[1].equals("Temperature")) {
-                                stream = new DataOutputStream( socket.getOutputStream() );
+                            stream = new DataOutputStream( socket.getOutputStream() );
+
+                            if(msg_received.split(" ")[1].charAt(0) == '1'  && dString.split(" ")[1].equals("Temperature")) {
                                 stream.writeUTF( dString + "\n" );
                             }
-                            if(msg_received.split(" ")[1].charAt(1) == 1  && dString.split(" ")[1].equals("Humidity")) {
-                                stream = new DataOutputStream( socket.getOutputStream() );
+                            if(msg_received.split(" ")[1].charAt(1) == '1'  && dString.split(" ")[1].equals("Humidity")) {
                                 stream.writeUTF( dString + "\n" );
                             }
-                            if(msg_received.split(" ")[1].charAt(2) == 1  && dString.split(" ")[1].equals("Pressure")) {
-                                stream = new DataOutputStream( socket.getOutputStream() );
+                            if(msg_received.split(" ")[1].charAt(2) == '1'  && dString.split(" ")[1].equals("Pressure")) {
                                 stream.writeUTF( dString + "\n" );
                             }
                         }
+                        assert stream != null;
                         stream.close();
                         socket.close();
                     } catch (IOException e) {

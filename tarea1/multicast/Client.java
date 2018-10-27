@@ -23,7 +23,6 @@ public class Client {
         add(10002);
         add(10003);
     }};
-    //private static final Pattern BINARY_PATTERN = Pattern.compile("([1][01])|1");
 
     public static void main(String[] args) {
 
