@@ -1,12 +1,7 @@
 # Multicast
   
-   Francisco Reyes --  201473117-5
-   
-   Diego Zamora    --  201473076-4
-    
-  ---
-
-   
+ Este es un pequeño ejemplo de un sistema multicast, en el presente proyecto podemos encontrar un cliente y un servidor, este ultimo enviara este tipo de variables. 
+ 
    * Variables
         * Temperatura
         * Humedad
@@ -15,8 +10,10 @@
    * Tiempo 
         * Las mediciones son emitidas cada 5 segundos
         
-        
-   * Puertos de conección
+       
+   * Puertos de conexión
+   Estos puertos disponibles (visibles para el cliente) se utilizan para generar grupos multicast.
+   
         * 90000 : Recuperación de mensajes
         * 10001 : Temperatura
         * 10002 : Humedad
@@ -30,7 +27,6 @@
         * [-R] : Variable opcional para recuperar el historial    
         * La conexión al servidor, solo se realizara si se conoce la dirección IP de la maquina antes mencionada.      
     
-   
    * Ejemplo del Cliente:
    
             user@user:∼$ java client 10.10.2.65 101 -R  
