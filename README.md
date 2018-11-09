@@ -1,6 +1,6 @@
 # Multicast
   
- Este es un pequeño ejemplo de un sistema multicast, en el presente proyecto podemos encontrar un cliente y un servidor, este ultimo enviara este tipo de variables. 
+ Este es un pequeño ejemplo de un sistema multicast, donde podemos encontrar un cliente y un servidor, este último enviara este tipo de variables. 
  
    * Variables
         * Temperatura
