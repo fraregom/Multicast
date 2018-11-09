@@ -1,4 +1,4 @@
-package tarea1.multicast;
+package project.multicast;
 
 import java.io.*;
 import java.net.*;
