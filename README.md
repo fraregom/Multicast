@@ -11,8 +11,7 @@
         * Las mediciones son emitidas cada 5 segundos
         
        
-   * Puertos de conexión
-   Estos puertos disponibles (visibles para el cliente) se utilizan para generar grupos multicast.
+   * Puertos de conexión, estos estan disponibles para un cliente, se utilizan para generar grupos multicast.
    
         * 90000 : Recuperación de mensajes
         * 10001 : Temperatura
